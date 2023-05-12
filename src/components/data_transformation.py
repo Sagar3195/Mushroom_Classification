@@ -31,8 +31,13 @@ class DataTransformation:
             #Dropping static column from train and test data
             static_column = 'veil-type'
             
+
+            train_df[target_column] = train_df[target_column].replace({"e":0, "p":1})
+
             input_feature_train_df= train_df.drop(columns= [target_column, static_column], axis= 1)
             target_feature_train_df= train_df[target_column]
+
+            test_df[target_column] = test_df[target_column].replace({"e":0, "p":1})
 
             input_feature_test_df= test_df.drop(columns= [target_column, static_column], axis= 1)
             target_feature_test_df= test_df[target_column]
