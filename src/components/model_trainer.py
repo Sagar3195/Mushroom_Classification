@@ -26,13 +26,14 @@ class ModelTrainer:
         try:
             logging.info("Split train and test dataset.")
 
-            target_column= 'class'
+            # target_column= 'class'
 
-            X_train= train_array.drop(columns= [target_column], axis = 1)
-            y_train= train_array[target_column]
-
-            X_test= test_array.drop(columns= [target_column], axis= 1)
-            y_test = test_array[target_column]
+            X_train, y_train, X_test, y_test = (
+                train_array[:,:-1],
+                train_array[:,-1],
+                test_array[:,:-1],
+                test_array[:,-1]
+            )
 
             # print("Y_train: {0} and \n Y_test: {1}".format(y_train, y_test))
             models = {
@@ -48,12 +49,13 @@ class ModelTrainer:
                  #   'penalty':['none','l1','l2','elasticnet']                
                 },
                 "Support Vector Classifier":{
-                #    'kernel':['poly', 'rbf', 'sigmoid']
+                    'C': [0.1, 1, 10, 100, 1000], 
+                    'gamma': [1, 0.1, 0.01, 0.001, 0.0001],
+                    'kernel': ['rbf']
                 },
                 "Decision Tree": {
-                #    'criterion':['gini', 'entropy', 'log_loss'],
-                #     'splitter':['best','random'],
-                 #    'max_features':['sqrt','log2']
+                   'criterion':['gini', 'entropy'],
+                   'max_depth':[2,4,6,8,10,12]
                 },
                 "KNN":{
                     'n_neighbors': range(1, 21, 2),
@@ -62,9 +64,10 @@ class ModelTrainer:
                 },
             
                 "Random Forest":{
-                  #  'criterion':['gini', 'entropy', 'log_loss'],
-                  #  'max_features':['sqrt','log2',None],
-                    'n_estimators': [8,16,32,64,128,256]
+                  'n_estimators': [20, 25, 50, 100],
+                  'max_features': ['sqrt', 'log2', None],
+                  'max_depth': [2,3, 6, 9],
+                  'max_leaf_nodes': [2,3, 4, 6,9],
                 }
                 
             }
@@ -81,7 +84,7 @@ class ModelTrainer:
                 list(model_report.values()).index(best_model_score)
             ]
             best_model = models[best_model_name]
-            #print("Best Model Name: {}".format(best_model))
+            print("Best Model Name: {}".format(best_model))
             if best_model_score<0.6:
                 raise CustomException("No best model found")
             logging.info(f"Best found model on both training and testing dataset")
